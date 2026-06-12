@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gradient Columns</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@300;400&display=swap');
+
+  :root {
+    --col-1: #0d0221;
+    --col-2: #1a0533;
+    --col-3: #0a0a2e;
+    --col-4: #001144;
+    --col-5: #0d0221;
+    --col-6: #1a0533;
+    --col-7: #0a0a2e;
+    --col-8: #001144;
+    --accent-1: #7b2fff;
+    --accent-2: #00d4ff;
+    --accent-3: #ff00aa;
+    --accent-4: #4488ff;
+    --speed: 4s;
+    --panel-bg: rgba(10, 5, 30, 0.72);
+    --panel-border: rgba(120, 80, 255, 0.25);
+    --btn-active: rgba(120, 80, 255, 0.35);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #000;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    font-family: 'Syne', sans-serif;
+  }
+
+  /* ── COLUMNS STAGE ── */
+  #stage {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  .col-wrap {
+    flex: 1;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Each column contains TWO rectangles stacked (200% height total)
+     so we scroll them seamlessly in a loop */
+  .col-inner {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    /* 200% = 2 × viewport height, gives seamless loop room */
+    height: 200%;
+    animation: wave-scroll var(--speed) linear infinite;
+  }
+
+  /* Odd columns scroll downward, even columns scroll upward */
+  .col-wrap:nth-child(even) .col-inner {
+    animation-name: wave-scroll-rev;
+  }
+
+  /* Toggle panel hint */
+  #toggle-panel::after {
+    content: ' (Ctrl+X)';
+    opacity: 0.5;
+    font-size: 9px;
+  }
+
+  /* Phase offsets create the wave feel */
+  .col-wrap:nth-child(1)  .col-inner { animation-delay:    0s; }
+  .col-wrap:nth-child(2)  .col-inner { animation-delay: -0.25s; }
+  .col-wrap:nth-child(3)  .col-inner { animation-delay: -0.50s; }
+  .col-wrap:nth-child(4)  .col-inner { animation-delay: -0.75s; }
+  .col-wrap:nth-child(5)  .col-inner { animation-delay: -1.00s; }
+  .col-wrap:nth-child(6)  .col-inner { animation-delay: -1.25s; }
+  .col-wrap:nth-child(7)  .col-inner { animation-delay: -1.50s; }
+  .col-wrap:nth-child(8)  .col-inner { animation-delay: -1.75s; }
+  .col-wrap:nth-child(9)  .col-inner { animation-delay: -2.00s; }
+  .col-wrap:nth-child(10) .col-inner { animation-delay: -2.25s; }
+  .col-wrap:nth-child(11) .col-inner { animation-delay: -2.50s; }
+  .col-wrap:nth-child(12) .col-inner { animation-delay: -2.75s; }
+  .col-wrap:nth-child(13) .col-inner { animation-delay: -3.00s; }
+  .col-wrap:nth-child(14) .col-inner { animation-delay: -3.25s; }
+  .col-wrap:nth-child(15) .col-inner { animation-delay: -3.50s; }
+  .col-wrap:nth-child(16) .col-inner { animation-delay: -3.75s; }
+
+  /* ── KEYFRAMES ── seamless: moves exactly 50% (= 1× viewport height) */
+  @keyframes wave-scroll {
+    0%   { transform: translateY(0); }
+    100% { transform: translateY(-50%); }
+  }
+  @keyframes wave-scroll-rev {
+    0%   { transform: translateY(-50%); }
+    100% { transform: translateY(0); }
+  }
+
+  /* Each rect is 50% of .col-inner height = 1× viewport height */
+  .rect {
+    width: 100%;
+    height: 50%;
+    position: relative;
+  }
+
+  /* Column colors via CSS vars assigned by JS */
+  .col-wrap:nth-child(1)  .rect { background: linear-gradient(180deg, var(--col-1) 0%, var(--accent-1) 50%, var(--col-1) 100%); }
+  .col-wrap:nth-child(2)  .rect { background: linear-gradient(180deg, var(--col-2) 0%, var(--accent-2) 50%, var(--col-2) 100%); }
+  .col-wrap:nth-child(3)  .rect { background: linear-gradient(180deg, var(--col-3) 0%, var(--accent-3) 50%, var(--col-3) 100%); }
+  .col-wrap:nth-child(4)  .rect { background: linear-gradient(180deg, var(--col-4) 0%, var(--accent-4) 50%, var(--col-4) 100%); }
+  .col-wrap:nth-child(5)  .rect { background: linear-gradient(180deg, var(--col-1) 0%, var(--accent-2) 50%, var(--col-1) 100%); }
+  .col-wrap:nth-child(6)  .rect { background: linear-gradient(180deg, var(--col-2) 0%, var(--accent-1) 50%, var(--col-2) 100%); }
+  .col-wrap:nth-child(7)  .rect { background: linear-gradient(180deg, var(--col-3) 0%, var(--accent-4) 50%, var(--col-3) 100%); }
+  .col-wrap:nth-child(8)  .rect { background: linear-gradient(180deg, var(--col-4) 0%, var(--accent-3) 50%, var(--col-4) 100%); }
+  .col-wrap:nth-child(9)  .rect { background: linear-gradient(180deg, var(--col-1) 0%, var(--accent-3) 50%, var(--col-1) 100%); }
+  .col-wrap:nth-child(10) .rect { background: linear-gradient(180deg, var(--col-2) 0%, var(--accent-4) 50%, var(--col-2) 100%); }
+  .col-wrap:nth-child(11) .rect { background: linear-gradient(180deg, var(--col-3) 0%, var(--accent-1) 50%, var(--col-3) 100%); }
+  .col-wrap:nth-child(12) .rect { background: linear-gradient(180deg, var(--col-4) 0%, var(--accent-2) 50%, var(--col-4) 100%); }
+  .col-wrap:nth-child(13) .rect { background: linear-gradient(180deg, var(--col-1) 0%, var(--accent-4) 50%, var(--col-1) 100%); }
+  .col-wrap:nth-child(14) .rect { background: linear-gradient(180deg, var(--col-2) 0%, var(--accent-3) 50%, var(--col-2) 100%); }
+  .col-wrap:nth-child(15) .rect { background: linear-gradient(180deg, var(--col-3) 0%, var(--accent-2) 50%, var(--col-3) 100%); }
+  .col-wrap:nth-child(16) .rect { background: linear-gradient(180deg, var(--col-4) 0%, var(--accent-1) 50%, var(--col-4) 100%); }
+
+  /* Subtle gap between columns */
+  .col-wrap + .col-wrap { border-left: 1px solid rgba(255,255,255,0.04); }
+
+  /* Preset scroll area */
+  #presets {
+    max-height: 120px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(120,80,255,0.4) transparent;
+    width: 100%;
+    justify-content: flex-start;
+    padding: 2px 0;
+  }
+  #presets::-webkit-scrollbar { width: 4px; }
+  #presets::-webkit-scrollbar-thumb { background: rgba(120,80,255,0.4); border-radius: 2px; }
+
+  /* Grain overlay for depth */
+  #grain {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.06;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+    mix-blend-mode: overlay;
+  }
+
+  /* ── CONTROL PANEL ── */
+  #panel {
+    position: fixed;
+    bottom: 36px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 20px;
+    padding: 18px 26px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: center;
+    backdrop-filter: blur(18px) saturate(1.4);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    box-shadow: 0 8px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04) inset;
+    min-width: 420px;
+    z-index: 100;
+    transition: opacity 0.4s;
+  }
+
+  #panel-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    align-self: flex-start;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  button {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.8);
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background 0.22s, border-color 0.22s, transform 0.12s, color 0.22s;
+    white-space: nowrap;
+  }
+  button:hover {
+    background: rgba(255,255,255,0.13);
+    border-color: rgba(255,255,255,0.3);
+    transform: translateY(-1px);
+  }
+  button.active {
+    background: var(--btn-active);
+    border-color: rgba(160,120,255,0.6);
+    color: #fff;
+  }
+
+  #btn-random {
+    background: linear-gradient(135deg, rgba(255,80,180,0.2), rgba(80,120,255,0.2));
+    border-color: rgba(200,100,255,0.3);
+  }
+  #btn-random:hover {
+    background: linear-gradient(135deg, rgba(255,80,180,0.35), rgba(80,120,255,0.35));
+    border-color: rgba(200,100,255,0.6);
+  }
+
+  .speed-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+  .speed-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    width: 48px;
+    flex-shrink: 0;
+  }
+  .speed-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    width: 32px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1;
+    height: 4px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+    border: 2px solid rgba(255,255,255,0.3);
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.25); }
+  input[type=range]::-moz-range-thumb {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+    border: 2px solid rgba(255,255,255,0.3);
+    cursor: pointer;
+  }
+
+  /* Hide panel toggle */
+  #toggle-panel {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 101;
+    background: rgba(10,5,30,0.6);
+    border: 1px solid rgba(120,80,255,0.25);
+    border-radius: 10px;
+    padding: 7px 14px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    letter-spacing: 0.1em;
+  }
+  #toggle-panel:hover { color: #fff; border-color: rgba(120,80,255,0.6); }
+</style>
+</head>
+<body>
+
+<div id="stage"></div>
+<div id="grain"></div>
+
+<button id="toggle-panel">HIDE UI</button>
+
+<div id="panel">
+  <div id="panel-label">// gradient columns</div>
+
+  <div class="btn-row" id="presets"></div>
+
+  <div class="speed-row">
+    <span class="speed-label">Speed</span>
+    <input type="range" id="speed-slider" min="1" max="10" value="5" step="0.1">
+    <span class="speed-val" id="speed-display">5.0</span>
+  </div>
+</div>
+
+<script>
+  // ─── THEMES ───────────────────────────────────────────────────────────────
+  const THEMES = {
+    'deep-space':    { bases: ['#0d0221','#0a0a2e','#001020','#050118','#0d0221','#0a0a2e','#001020','#050118'], accents: ['#7b2fff','#00d4ff','#ff00aa','#4488ff'] },
+    'sunset':        { bases: ['#1a0500','#200800','#180210','#120018','#1a0500','#200800','#180210','#120018'], accents: ['#ff6b00','#ff2255','#ffaa00','#cc0055'] },
+    'emerald':       { bases: ['#001a0a','#001208','#00200e','#001810','#001a0a','#001208','#00200e','#001810'], accents: ['#00e87a','#00ffcc','#44ff88','#00cc66'] },
+    'cyberpunk':     { bases: ['#0a0010','#060018','#000a18','#0a0800','#0a0010','#060018','#000a18','#0a0800'], accents: ['#ffe600','#ff0080','#00f0ff','#ff6600'] },
+    'aurora':        { bases: ['#000d08','#000a10','#00080d','#000610','#000d08','#000a10','#00080d','#000610'], accents: ['#00ff88','#00ccff','#88ff00','#0088ff'] },
+    'lava':          { bases: ['#120000','#0d0000','#100500','#080000','#120000','#0d0000','#100500','#080000'], accents: ['#ff2200','#ff8800','#ff0044','#ffcc00'] },
+    'galaxy':        { bases: ['#05000f','#080020','#040015','#020010','#05000f','#080020','#040015','#020010'], accents: ['#cc00ff','#ff44cc','#8800ff','#ff00ff'] },
+    'ocean-deep':    { bases: ['#000a18','#000818','#00061a','#00040f','#000a18','#000818','#00061a','#00040f'], accents: ['#0088ff','#00ddff','#0044cc','#00ffee'] },
+    'toxic':         { bases: ['#030a00','#050c00','#040800','#020600','#030a00','#050c00','#040800','#020600'], accents: ['#aaff00','#00ff44','#ffff00','#44ff00'] },
+    'rose-gold':     { bases: ['#120005','#0f0008','#100003','#0d0007','#120005','#0f0008','#100003','#0d0007'], accents: ['#ff4488','#ffaa88','#ff88aa','#ffcc99'] },
+    'neon-city':     { bases: ['#000308','#000508','#000206','#000408','#000308','#000508','#000206','#000408'], accents: ['#ff00ff','#00ffff','#ff8800','#8800ff'] },
+    'arctic':        { bases: ['#000818','#000a20','#00060f','#000c25','#000818','#000a20','#00060f','#000c25'], accents: ['#aaddff','#ffffff','#88ccff','#cceeff'] },
+    'volcano':       { bases: ['#100200','#0d0100','#100500','#080200','#100200','#0d0100','#100500','#080200'], accents: ['#ff4400','#ff9900','#ff2200','#ffcc44'] },
+    'amethyst':      { bases: ['#0a0015','#080010','#0b0018','#06000f','#0a0015','#080010','#0b0018','#06000f'], accents: ['#cc44ff','#ff88cc','#aa00ff','#ff44ff'] },
+    'mint':          { bases: ['#001510','#00180d','#001008','#001a0f','#001510','#00180d','#001008','#001a0f'], accents: ['#44ffcc','#88ffdd','#00ffaa','#aaffee'] },
+    'blood-moon':    { bases: ['#0f0000','#120000','#0a0000','#100000','#0f0000','#120000','#0a0000','#100000'], accents: ['#cc0000','#ff2200','#880000','#ff4444'] },
+    'electric-blue': { bases: ['#000010','#00000f','#000015','#00000a','#000010','#00000f','#000015','#00000a'], accents: ['#0044ff','#0088ff','#00ccff','#4488ff'] },
+    'golden-hour':   { bases: ['#100800','#0f0600','#120a00','#0d0700','#100800','#0f0600','#120a00','#0d0700'], accents: ['#ffcc00','#ff8800','#ffee44','#ff6600'] },
+    'teal-dream':    { bases: ['#001212','#000f0f','#001515','#000a0a','#001212','#000f0f','#001515','#000a0a'], accents: ['#00cccc','#00ffee','#00aaaa','#44ffff'] },
+    'magma':         { bases: ['#0e0000','#0a0100','#0c0000','#100200','#0e0000','#0a0100','#0c0000','#100200'], accents: ['#ff6600','#ff3300','#ffaa00','#ff0000'] },
+    'starfield':     { bases: ['#010105','#020208','#010106','#030310','#010105','#020208','#010106','#030310'], accents: ['#ffffff','#aabbff','#eeeeff','#8899ff'] },
+    'plasma':        { bases: ['#080010','#050008','#0a0015','#030006','#080010','#050008','#0a0015','#030006'], accents: ['#ff00cc','#cc00ff','#ff44ff','#aa00cc'] },
+    'jade':          { bases: ['#001a08','#00150a','#001808','#00200a','#001a08','#00150a','#001808','#00200a'], accents: ['#00cc66','#44ff88','#00aa55','#88ffaa'] },
+    'ice-cave':      { bases: ['#000a12','#00080f','#000c15','#000610','#000a12','#00080f','#000c15','#000610'], accents: ['#88ddff','#aaeeff','#66ccff','#ccf5ff'] },
+    'burning-sky':   { bases: ['#0f0500','#120300','#100400','#0d0600','#0f0500','#120300','#100400','#0d0600'], accents: ['#ff8800','#ffcc00','#ff4400','#ff5500'] },
+    'ultraviolet':   { bases: ['#060010','#050008','#080015','#040008','#060010','#050008','#080015','#040008'], accents: ['#9900ff','#cc00ff','#7700cc','#bb44ff'] },
+    'bioluminescent':{ bases: ['#000a06','#000806','#000d08','#000604','#000a06','#000806','#000d08','#000604'], accents: ['#00ff88','#44ffcc','#00ffaa','#88ffdd'] },
+    'copper':        { bases: ['#0f0500','#0d0400','#100600','#0b0300','#0f0500','#0d0400','#100600','#0b0300'], accents: ['#cc6600','#ff9944','#aa5500','#ffbb77'] },
+    'midnight-blue': { bases: ['#000015','#000010','#000018','#00000f','#000015','#000010','#000018','#00000f'], accents: ['#2244cc','#4488ff','#1133aa','#66aaff'] },
+    'cherry-blossom':{ bases: ['#120008','#0f0005','#100008','#0d0005','#120008','#0f0005','#100008','#0d0005'], accents: ['#ff88aa','#ffaacc','#ff6699','#ffccdd'] },
+    'neptune':       { bases: ['#000a18','#00060f','#000c1a','#00080f','#000a18','#00060f','#000c1a','#00080f'], accents: ['#4488ff','#00ccff','#2266cc','#88ddff'] },
+    'neon-green':    { bases: ['#010800','#020a00','#010600','#030c00','#010800','#020a00','#010600','#030c00'], accents: ['#00ff44','#44ff00','#00cc33','#88ff00'] },
+    'supernova':     { bases: ['#080000','#0a0005','#060000','#090003','#080000','#0a0005','#060000','#090003'], accents: ['#ff0044','#ff8800','#ffff00','#ff4400'] },
+    'frozen-lake':   { bases: ['#00060f','#00040c','#00080f','#000305','#00060f','#00040c','#00080f','#000305'], accents: ['#88ccff','#ccffff','#66aaff','#aaddff'] },
+    'abyssal':       { bases: ['#000008','#000006','#00000a','#000004','#000008','#000006','#00000a','#000004'], accents: ['#000088','#0000ff','#000044','#2200ff'] },
+    'paprika':       { bases: ['#100200','#0d0100','#0f0300','#0a0100','#100200','#0d0100','#0f0300','#0a0100'], accents: ['#ff2200','#cc4400','#ff5500','#ff8855'] },
+    'sapphire':      { bases: ['#000015','#000012','#000018','#00000f','#000015','#000012','#000018','#00000f'], accents: ['#0055ff','#0099ff','#0033cc','#44aaff'] },
+    'lemon-acid':    { bases: ['#080800','#0a0a00','#060600','#0c0c00','#080800','#0a0a00','#060600','#0c0c00'], accents: ['#ffff00','#ccff00','#ffee00','#aaff00'] },
+    'redwood':       { bases: ['#0f0200','#0d0100','#100300','#0b0100','#0f0200','#0d0100','#100300','#0b0100'], accents: ['#cc3300','#ff6644','#aa2200','#ff8877'] },
+    'moonrise':      { bases: ['#080808','#060606','#0a0a0a','#040404','#080808','#060606','#0a0a0a','#040404'], accents: ['#ccddff','#ffffff','#aabbee','#eeeeff'] },
+    'poison':        { bases: ['#030a00','#040c00','#020800','#050e00','#030a00','#040c00','#020800','#050e00'], accents: ['#88ff00','#00ff44','#ccff00','#44ff88'] },
+    'nuclear':       { bases: ['#080800','#060800','#0a0a00','#040400','#080800','#060800','#0a0a00','#040400'], accents: ['#aaff00','#ffff00','#88cc00','#ccff44'] },
+    'cobalt':        { bases: ['#000010','#00000d','#000015','#00000a','#000010','#00000d','#000015','#00000a'], accents: ['#0033cc','#0066ff','#0022aa','#4477ff'] },
+    'peach-fuzz':    { bases: ['#120500','#100400','#0f0600','#110300','#120500','#100400','#0f0600','#110300'], accents: ['#ff9966','#ffbbaa','#ff7755','#ffccbb'] },
+    'phantom':       { bases: ['#050008','#040006','#060008','#030005','#050008','#040006','#060008','#030005'], accents: ['#8844ff','#cc88ff','#6622ee','#aa66ff'] },
+    'solar-flare':   { bases: ['#100400','#0f0300','#120500','#0d0200','#100400','#0f0300','#120500','#0d0200'], accents: ['#ffaa00','#ff5500','#ffdd00','#ff8800'] },
+    'deep-teal':     { bases: ['#001010','#000c0c','#001515','#000808','#001010','#000c0c','#001515','#000808'], accents: ['#00aaaa','#00ffff','#008888','#44cccc'] },
+    'hot-pink':      { bases: ['#100008','#0d0005','#120008','#0b0006','#100008','#0d0005','#120008','#0b0006'], accents: ['#ff0088','#ff44aa','#cc0066','#ff88cc'] },
+    'void':          { bases: ['#000000','#000000','#000000','#000000','#000000','#000000','#000000','#000000'], accents: ['#440088','#880044','#004488','#440044'] },
+    'matrix':        { bases: ['#000500','#000300','#000600','#000200','#000500','#000300','#000600','#000200'], accents: ['#00ff00','#00cc00','#44ff44','#00aa00'] },
+    'oil-slick':     { bases: ['#040404','#030305','#050503','#040403','#040404','#030305','#050503','#040403'], accents: ['#ff00ff','#00ffff','#ffff00','#ff8800'] },
+    'infrared':      { bases: ['#0f0000','#100000','#0d0000','#110000','#0f0000','#100000','#0d0000','#110000'], accents: ['#ff0000','#ff4400','#cc0000','#ff2200'] },
+    'nordic':        { bases: ['#000810','#000610','#000a12','#000508','#000810','#000610','#000a12','#000508'], accents: ['#5588ff','#88aaff','#3366cc','#aaccff'] },
+    'obsidian':      { bases: ['#030303','#020202','#040404','#010101','#030303','#020202','#040404','#010101'], accents: ['#555555','#888888','#aaaaaa','#333333'] },
+    'tiger':         { bases: ['#0f0300','#0d0200','#100400','#0b0200','#0f0300','#0d0200','#100400','#0b0200'], accents: ['#ff6600','#ff9900','#cc4400','#ffbb44'] },
+    'disco':         { bases: ['#080008','#060006','#0a000a','#040004','#080008','#060006','#0a000a','#040004'], accents: ['#ff00ff','#00ffff','#ff8800','#00ff00'] },
+    'dusky-rose':    { bases: ['#0f0208','#0d0106','#100308','#0b0106','#0f0208','#0d0106','#100308','#0b0106'], accents: ['#cc6688','#ff88aa','#aa4466','#ffaacc'] },
+    'warp-drive':    { bases: ['#010010','#00000f','#020012','#00000c','#010010','#00000f','#020012','#00000c'], accents: ['#8800ff','#ff00ff','#0044ff','#00ffff'] },
+    'molten-gold':   { bases: ['#0f0800','#0d0600','#100900','#0b0700','#0f0800','#0d0600','#100900','#0b0700'], accents: ['#ffcc00','#ff9900','#ffee44','#ff8800'] },
+    'indigo-night':  { bases: ['#050015','#040010','#060018','#03000f','#050015','#040010','#060018','#03000f'], accents: ['#6644ff','#aa88ff','#4422cc','#8866ff'] },
+    'forest-fire':   { bases: ['#080200','#0a0100','#060200','#090300','#080200','#0a0100','#060200','#090300'], accents: ['#ff4400','#aaff00','#ff8800','#ffcc00'] },
+    'periwinkle':    { bases: ['#050010','#04000d','#060012','#03000a','#050010','#04000d','#060012','#03000a'], accents: ['#8888ff','#aaaaff','#6666cc','#ccccff'] },
+    'terra':         { bases: ['#0a0300','#080200','#0c0400','#060200','#0a0300','#080200','#0c0400','#060200'], accents: ['#cc7744','#ff9966','#aa5533','#ffbb88'] },
+  };
+
+  // User's randomize color pool
+  const RANDOM_POOL = [
+    '#ff00aa','#7b2fff','#00d4ff','#ff6b00','#00e87a','#ffe600',
+    '#ff2255','#4488ff','#cc0055','#00ffcc','#ff0080','#00f0ff',
+    '#ff6600','#44ff88','#ffaa00','#9900ff','#00aaff','#ff3300',
+    '#00ff88','#aa00ff','#ff00ff','#00ffaa','#ffcc00','#0088ff',
+  ];
+
+  // ─── BUILD COLUMNS ────────────────────────────────────────────────────────
+  const stage = document.getElementById('stage');
+  const NUM_COLS = 16;
+
+  for (let i = 0; i < NUM_COLS; i++) {
+    const wrap = document.createElement('div');
+    wrap.className = 'col-wrap';
+    const inner = document.createElement('div');
+    inner.className = 'col-inner';
+    // Two rects for seamless loop
+    inner.innerHTML = '<div class="rect"></div><div class="rect"></div>';
+    wrap.appendChild(inner);
+    stage.appendChild(wrap);
+  }
+
+  // ─── APPLY THEME ─────────────────────────────────────────────────────────
+  function applyTheme(theme) {
+    const root = document.documentElement;
+    theme.bases.forEach((c, i)   => root.style.setProperty(`--col-${i+1}`, c));
+    theme.accents.forEach((c, i) => root.style.setProperty(`--accent-${i+1}`, c));
+  }
+
+  // ─── SPEED ────────────────────────────────────────────────────────────────
+  // Map slider 1–10 → duration 12s (slow) to 1.2s (fast)
+  function speedToDuration(v) {
+    return (12 / v).toFixed(2) + 's';
+  }
+
+  function applySpeed(v) {
+    document.documentElement.style.setProperty('--speed', speedToDuration(v));
+    // Restart animations for instant feel
+    document.querySelectorAll('.col-inner').forEach(el => {
+      el.style.animationDuration = speedToDuration(v);
+    });
+  }
+
+  // ─── BUILD PRESET BUTTONS ─────────────────────────────────────────────────
+  const presetsEl = document.getElementById('presets');
+  const themeNames = {
+    'deep-space':'Deep Space','sunset':'Sunset','emerald':'Emerald','cyberpunk':'Cyberpunk',
+    'aurora':'Aurora','lava':'Lava','galaxy':'Galaxy','ocean-deep':'Ocean Deep',
+    'toxic':'Toxic','rose-gold':'Rose Gold','neon-city':'Neon City','arctic':'Arctic',
+    'volcano':'Volcano','amethyst':'Amethyst','mint':'Mint','blood-moon':'Blood Moon',
+    'electric-blue':'Electric Blue','golden-hour':'Golden Hour','teal-dream':'Teal Dream',
+    'magma':'Magma','starfield':'Starfield','plasma':'Plasma','jade':'Jade',
+    'ice-cave':'Ice Cave','burning-sky':'Burning Sky','ultraviolet':'Ultraviolet',
+    'bioluminescent':'Bioluminescent','copper':'Copper','midnight-blue':'Midnight Blue',
+    'cherry-blossom':'Cherry Blossom','neptune':'Neptune','neon-green':'Neon Green',
+    'supernova':'Supernova','frozen-lake':'Frozen Lake','abyssal':'Abyssal',
+    'paprika':'Paprika','sapphire':'Sapphire','lemon-acid':'Lemon Acid','redwood':'Redwood',
+    'moonrise':'Moonrise','poison':'Poison','nuclear':'Nuclear','cobalt':'Cobalt',
+    'peach-fuzz':'Peach Fuzz','phantom':'Phantom','solar-flare':'Solar Flare',
+    'deep-teal':'Deep Teal','hot-pink':'Hot Pink','void':'Void','matrix':'Matrix',
+    'oil-slick':'Oil Slick','infrared':'Infrared','nordic':'Nordic','obsidian':'Obsidian',
+    'tiger':'Tiger','disco':'Disco','dusky-rose':'Dusky Rose','warp-drive':'Warp Drive',
+    'molten-gold':'Molten Gold','indigo-night':'Indigo Night','forest-fire':'Forest Fire',
+    'periwinkle':'Periwinkle','terra':'Terra',
+  };
+
+  Object.keys(themeNames).forEach(key => {
+    const btn = document.createElement('button');
+    btn.className = 'preset';
+    btn.dataset.theme = key;
+    btn.textContent = themeNames[key];
+    if (key === 'deep-space') btn.classList.add('active');
+    presetsEl.appendChild(btn);
+  });
+
+  const randomBtn = document.createElement('button');
+  randomBtn.id = 'btn-random';
+  randomBtn.textContent = '✦ Randomize';
+  presetsEl.appendChild(randomBtn);
+
+  // ─── PRESET BUTTONS ───────────────────────────────────────────────────────
+  document.querySelectorAll('.preset').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.preset').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyTheme(THEMES[btn.dataset.theme]);
+    });
+  });
+
+  // ─── RANDOMIZE ────────────────────────────────────────────────────────────
+  document.getElementById('btn-random').addEventListener('click', () => {
+    document.querySelectorAll('.preset').forEach(b => b.classList.remove('active'));
+
+    const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
+    const pool = shuffle(RANDOM_POOL);
+
+    const accents = pool.slice(0, 4);
+    // Dark bases derived from first accent (darkened)
+    const darken = hex => {
+      const r = parseInt(hex.slice(1,3),16);
+      const g = parseInt(hex.slice(3,5),16);
+      const b = parseInt(hex.slice(5,7),16);
+      return `rgb(${Math.round(r*0.07)},${Math.round(g*0.07)},${Math.round(b*0.07)})`;
+    };
+    const bases = Array.from({length:8}, (_,i) => darken(accents[i%4]));
+    applyTheme({ bases, accents });
+  });
+
+  // ─── SPEED SLIDER ─────────────────────────────────────────────────────────
+  const slider  = document.getElementById('speed-slider');
+  const speedDV = document.getElementById('speed-display');
+
+  slider.addEventListener('input', () => {
+    const v = parseFloat(slider.value);
+    speedDV.textContent = v.toFixed(1);
+    applySpeed(v);
+  });
+
+  // ─── TOGGLE PANEL ─────────────────────────────────────────────────────────
+  const panel  = document.getElementById('panel');
+  const toggleBtn = document.getElementById('toggle-panel');
+  let panelVisible = true;
+
+  toggleBtn.addEventListener('click', () => {
+    panelVisible = !panelVisible;
+    panel.style.opacity = panelVisible ? '1' : '0';
+    panel.style.pointerEvents = panelVisible ? 'all' : 'none';
+    toggleBtn.textContent = panelVisible ? 'HIDE UI' : 'SHOW UI';
+  });
+
+  // ─── KEYBOARD SHORTCUT Ctrl+X ────────────────────────────────────────────
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'x') {
+      e.preventDefault();
+      panelVisible = !panelVisible;
+      panel.style.opacity = panelVisible ? '1' : '0';
+      panel.style.pointerEvents = panelVisible ? 'all' : 'none';
+      toggleBtn.textContent = panelVisible ? 'HIDE UI' : 'SHOW UI';
+    }
+  });
+
+  // ─── INIT ────────────────────────────────────────────────────────────────
+  applyTheme(THEMES['deep-space']);
+  applySpeed(5);
+</script>
+</body>
+</html>
